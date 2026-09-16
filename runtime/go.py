@@ -16,7 +16,7 @@ PYTHON = sys.executable
 HOST = os.environ.get("FLV_HOST", "127.0.0.1")
 PORT = int(os.environ.get("FLV_PORT", "4402"))
 URL = f"http://{HOST}:{PORT}"
-DETACHED = 0x00000008 | 0x00000200
+DETACHED = 0x00000008 | 0x00000200 | 0x01000000  # DETACHED | NEW_GROUP | BREAKAWAY_FROM_JOB
 
 
 def health():
