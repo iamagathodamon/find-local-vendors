@@ -4,9 +4,17 @@ Use when an agent needs a clean list of real local businesses in a trade and a c
 
 One URL. One job. Paid per call.
 
+Public: https://find-local-vendors.agathodamon.com
+
 ```
-POST /v1/find
+POST https://find-local-vendors.agathodamon.com/v1/find
 {"trade":"HVAC","city":"Dallas, TX","max_results":10}
+```
+
+Skill listing:
+
+```
+npx skills add iamagathodamon/find-local-vendors
 ```
 
 Returns name, phone, website, address, coordinates, OSM id, and a receipt.
