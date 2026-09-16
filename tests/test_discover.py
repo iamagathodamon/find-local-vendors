@@ -63,13 +63,34 @@ class DiscoverTests(unittest.TestCase):
         def geocode(_city):
             return {"lat": 32.78, "lon": -96.8, "display_name": "Dallas, Texas, USA"}
 
-        def overpass(_query):
-            return json.dumps(OSM_FIXTURE).encode()
+        def search(_trade, _city, _limit):
+            return [
+                {
+                    "osm_type": "node",
+                    "osm_id": 1,
+                    "lat": "32.78",
+                    "lon": "-96.8",
+                    "name": "Metro Mechanical HVAC",
+                    "display_name": "Metro Mechanical HVAC, Dallas, TX",
+                    "class": "craft",
+                    "extratags": {"phone": "+1 214 555 0142", "website": "https://metro.example"},
+                    "address": {
+                        "house_number": "100",
+                        "road": "Main St",
+                        "city": "Dallas",
+                        "state": "TX",
+                    },
+                }
+            ]
 
-        result = find_vendors("HVAC", "Dallas, TX", geocode=geocode, overpass_fetch=overpass)
-        self.assertEqual(result["count"], 2)
-        self.assertEqual(result["provider"], "openstreetmap")
+        def lookup(_ids):
+            return {}
+
+        result = find_vendors("HVAC", "Dallas, TX", geocode=geocode, search=search, lookup=lookup)
+        self.assertEqual(result["count"], 1)
+        self.assertEqual(result["provider"], "openstreetmap-nominatim")
         self.assertEqual(result["vendors"][0]["name"], "Metro Mechanical HVAC")
+        self.assertEqual(result["vendors"][0]["phone"], "+1 214 555 0142")
 
     def test_requires_trade_and_city(self):
         with self.assertRaises(ValueError):
