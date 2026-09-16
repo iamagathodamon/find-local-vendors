@@ -19,7 +19,7 @@ PUBLIC = os.environ.get("FLV_PUBLIC_BASE", "https://find-local-vendors.agathodam
 URL = f"http://{HOST}:{PORT}"
 CLOUDFLARED = Path(r"C:\Users\damon\cloudflared.exe")
 TUNNEL_CONFIG = ROOT / "runtime" / "cloudflared.yml"
-DETACHED = 0x00000008 | 0x00000200 | 0x01000000  # DETACHED | NEW_GROUP | BREAKAWAY_FROM_JOB
+DETACHED = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
 
 
 def health():
