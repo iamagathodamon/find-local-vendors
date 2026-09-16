@@ -15,7 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 HOST = os.environ.get("FLV_HOST", "127.0.0.1")
 PORT = int(os.environ.get("FLV_PORT", "4402"))
+PUBLIC = os.environ.get("FLV_PUBLIC_BASE", "https://find-local-vendors.agathodamon.com")
 URL = f"http://{HOST}:{PORT}"
+CLOUDFLARED = Path(r"C:\Users\damon\cloudflared.exe")
+TUNNEL_CONFIG = ROOT / "runtime" / "cloudflared.yml"
 DETACHED = 0x00000008 | 0x00000200 | 0x01000000  # DETACHED | NEW_GROUP | BREAKAWAY_FROM_JOB
 
 
@@ -27,15 +30,12 @@ def health():
         return None
 
 
-def start():
-    env = os.environ.copy()
-    env["FLV_HOST"] = HOST
-    env["FLV_PORT"] = str(PORT)
-    log = ROOT / "runtime" / "go.log"
+def spawn(command, log_name, env=None):
+    log = ROOT / "runtime" / log_name
     log.parent.mkdir(parents=True, exist_ok=True)
     handle = open(log, "a", encoding="utf-8")
     subprocess.Popen(
-        [PYTHON, "-u", str(ROOT / "src" / "server.py")],
+        command,
         cwd=str(ROOT),
         env=env,
         stdin=subprocess.DEVNULL,
@@ -44,6 +44,19 @@ def start():
         creationflags=DETACHED if os.name == "nt" else 0,
         start_new_session=os.name != "nt",
     )
+
+
+def start():
+    env = os.environ.copy()
+    env["FLV_HOST"] = HOST
+    env["FLV_PORT"] = str(PORT)
+    env["FLV_PUBLIC_BASE"] = PUBLIC
+    spawn([PYTHON, "-u", str(ROOT / "src" / "server.py")], "go.log", env)
+    if CLOUDFLARED.exists() and TUNNEL_CONFIG.exists():
+        spawn(
+            [str(CLOUDFLARED), "--config", str(TUNNEL_CONFIG), "tunnel", "run"],
+            "tunnel.log",
+        )
 
 
 def wait(seconds=12):
@@ -70,10 +83,11 @@ def main() -> int:
     print("find-local-vendors ON")
     print(f"status   {started}")
     print(f"local    {URL}")
+    print(f"public   {PUBLIC}")
     print("use when you need a clean list of real local businesses in a trade and a city")
     print("sandbox  X-Api-Key: sandbox")
-    print(f"docs     {URL}/llms.txt")
-    print(f"skill    {URL}/skill/SKILL.md")
+    print(f"docs     {PUBLIC}/llms.txt")
+    print(f"skill    {PUBLIC}/skill/SKILL.md")
     return 0
 
 

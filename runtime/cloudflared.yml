@@ -1,0 +1,6 @@
+tunnel: e63aa717-2282-49ec-8d05-c7f1a2daec6f
+credentials-file: C:\Users\damon\.cloudflared\e63aa717-2282-49ec-8d05-c7f1a2daec6f.json
+ingress:
+  - hostname: find-local-vendors.agathodamon.com
+    service: http://127.0.0.1:4402
+  - service: http_status:404

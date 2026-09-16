@@ -18,7 +18,8 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 DEFAULT_RADIUS_M = 12000
 DEFAULT_MAX_RESULTS = 10
 HARD_MAX_RESULTS = 25
-SKIP_CLASSES = {"highway", "railway", "waterway", "place", "boundary", "landuse"}
+SKIP_CLASSES = {"highway", "railway", "waterway", "place", "boundary", "landuse", "man_made", "building", "natural"}
+EQUIPMENT_NAME = re.compile(r"\b(system|chiller|boiler|unit|equipment)\b", re.I)
 
 TRADE_PATTERNS = {
     "hvac": r"hvac|heating|air.?conditioning|furnace|climate control",
@@ -105,6 +106,9 @@ def search_trade(trade: str, city: str, limit: int, fetch=_get) -> list[dict[str
         if (row.get("class") or "") in SKIP_CLASSES:
             continue
         if not (row.get("display_name") or row.get("name")):
+            continue
+        label = (row.get("name") or row.get("display_name") or "").split(",")[0]
+        if EQUIPMENT_NAME.search(label) and not re.search(r"\b(llc|inc|co|company|services?)\b", label, re.I):
             continue
         kept.append(row)
         if len(kept) >= limit:
@@ -270,9 +274,11 @@ def find_vendors(
         if not vendor:
             continue
         key = vendor["osm_id"] or vendor["name"].lower()
-        if key in seen:
+        name_key = vendor["name"].strip().lower()
+        if key in seen or name_key in seen:
             continue
         seen.add(key)
+        seen.add(name_key)
         vendors.append(vendor)
         if len(vendors) >= max_results:
             break
