@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://find-local-vendors.agathodamon.com/llms.txt

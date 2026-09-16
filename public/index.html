@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find local trade vendors</title>
+  <meta name="description" content="Use when you need a clean list of real local businesses in a trade and a city, with phone, website, and address.">
+  <link rel="canonical" href="https://find-local-vendors.agathodamon.com/">
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; background: #10110f; color: #e7e1d1; font: 18px/1.45 "Iowan Old Style", "Palatino Linotype", Palatino, serif; }
+    main { max-width: 42rem; margin: 0 auto; padding: 3.5rem 1.25rem 5rem; }
+    h1 { font-size: 2.2rem; line-height: 1.15; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 0.8rem; }
+    .use { font-size: 1.15rem; color: #f3c96b; margin: 0 0 2rem; }
+    p { margin: 0 0 1rem; }
+    a { color: #f3c96b; }
+    pre, code { font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace; font-size: 0.86rem; }
+    pre { background: #1a1c18; border: 1px solid #2c2f28; padding: 1rem; overflow: auto; }
+    label { display: block; font-size: 0.85rem; margin: 0.8rem 0 0.25rem; color: #b7b09c; }
+    input { width: 100%; box-sizing: border-box; background: #1a1c18; color: #e7e1d1; border: 1px solid #2c2f28; padding: 0.55rem 0.7rem; font: inherit; }
+    button { margin-top: 1rem; background: #f3c96b; color: #14150f; border: 0; padding: 0.6rem 1rem; font: 600 1rem/1 serif; cursor: pointer; }
+    button:disabled { opacity: 0.5; }
+    .out { margin-top: 1rem; white-space: pre-wrap; }
+    footer { margin-top: 3rem; color: #8d8776; font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Find local trade vendors</h1>
+    <p class="use">Use when you need a clean list of real local businesses in a trade and a city, with phone, website, and address.</p>
+    <p>An agent sends a trade and a city. This endpoint returns the businesses OpenStreetMap actually has on the map, plus a receipt for the call.</p>
+    <pre>POST /v1/find
+X-Api-Key: sandbox
+
+{
+  "trade": "HVAC",
+  "city": "Dallas, TX",
+  "max_results": 10
+}</pre>
+    <p>Example result: name, phone, website, email if OSM has one, address, coordinates, OSM id, source URL, and a one-line receipt (time, input, result count, cost).</p>
+    <p>Sandbox key <code>sandbox</code> is three free calls a day. Paid calls are $0.50, with a $25 daily cap unless the owner raises it.</p>
+    <p><a href="/llms.txt">llms.txt</a> · <a href="/skill/SKILL.md">SKILL.md</a> · <a href="/v1/openapi.json">openapi</a></p>
+    <form id="try">
+      <label>Trade <input name="trade" value="HVAC" required></label>
+      <label>City <input name="city" value="Dallas, TX" required></label>
+      <button type="submit">Call it</button>
+    </form>
+    <pre class="out" id="out">Waiting.</pre>
+    <footer>A public tool of <a href="https://agathodamon.com">agathodamon.com</a>. Not a clinic product.</footer>
+  </main>
+  <script>
+    const out = document.getElementById("out");
+    document.getElementById("try").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(event.target);
+      out.textContent = "Calling…";
+      try {
+        const response = await fetch("/v1/find", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Api-Key": "sandbox" },
+          body: JSON.stringify({ trade: data.get("trade"), city: data.get("city"), max_results: 10 })
+        });
+        out.textContent = await response.text();
+      } catch (err) {
+        out.textContent = String(err);
+      }
+    });
+  </script>
+</body>
+</html>

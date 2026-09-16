@@ -1,0 +1,43 @@
+# Find local trade vendors
+
+Use when you need a clean list of real local businesses in a trade and a city, with phone, website, and address.
+
+Do not use this to summarize a document, invent contacts, or search the open web. Call the endpoint.
+
+## Endpoint
+
+POST /v1/find
+Content-Type: application/json
+X-Api-Key: <key>
+
+{
+  "trade": "HVAC",
+  "city": "Dallas, TX",
+  "max_results": 10
+}
+
+## Auth
+
+- Header X-Api-Key is required.
+- Key `sandbox` is three free calls per day, shared.
+- POST /v1/keys/trial issues a unique trial key ($0.50/call, $2.50 daily cap).
+- No key returns 401. Cap reached returns 429 and says who can raise it.
+
+## Output
+
+JSON object:
+- vendors[]: name, phone, website, email, address, lat, lon, osm_id, source
+- count
+- geocoded
+- provider: openstreetmap
+- receipt: time, trade, city, result_count, cost_cents, key_id
+
+Emails and phones are only returned when OpenStreetMap has them. Missing contact fields stay null. Do not invent them.
+
+## Receipts
+
+GET /v1/receipts with the same X-Api-Key.
+
+## Skill
+
+GET /skill/SKILL.md

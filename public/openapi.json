@@ -1,0 +1,45 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Find local trade vendors",
+    "version": "1.0.0",
+    "description": "Use when you need a clean list of real local businesses in a trade and a city, with phone, website, and address."
+  },
+  "paths": {
+    "/v1/find": {
+      "post": {
+        "operationId": "findLocalVendors",
+        "summary": "Find local trade vendors in a city",
+        "parameters": [
+          {
+            "name": "X-Api-Key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["trade", "city"],
+                "properties": {
+                  "trade": { "type": "string", "examples": ["HVAC"] },
+                  "city": { "type": "string", "examples": ["Dallas, TX"] },
+                  "max_results": { "type": "integer", "default": 10, "maximum": 25 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Vendor list and receipt" },
+          "401": { "description": "Missing key" },
+          "429": { "description": "Daily cap reached" }
+        }
+      }
+    }
+  }
+}
